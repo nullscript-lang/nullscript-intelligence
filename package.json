@@ -77,13 +77,6 @@
         }
       }
     ],
-    "iconThemes": [
-      {
-        "id": "nullscript-icons",
-        "label": "NullScript File Icons",
-        "path": "./themes/nullscript-icon-theme.json"
-      }
-    ],
     "grammars": [
       {
         "language": "nullscript",
@@ -126,8 +119,8 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/node": "24.x",
-    "@types/vscode": "^1.102.0",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.74.0",
     "@vscode/vsce": "^3.6.0",
     "typescript": "^5.9.2"
   }
