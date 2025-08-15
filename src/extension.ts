@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import { NULLSCRIPT_KEYWORDS } from "./nullscript-keywords";
+import { KeywordMapping } from "./interface";
+import { KEYWORDS } from "./keywords";
 
 export function activate(context: vscode.ExtensionContext) {
   const completionProvider = vscode.languages.registerCompletionItemProvider(
@@ -47,9 +48,14 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         return this.getClockMethodCompletions();
       }
 
-      const builtInCompletions = this.getBuiltInCompletions();
+      if (beforeCursor.includes("use ") || beforeCursor.endsWith("from ")) {
+        return this.getImportCompletions(document, position, beforeCursor);
+      }
 
-      return builtInCompletions;
+      const builtInCompletions = this.getBuiltInCompletions();
+      const patternCompletions = this.getPatternCompletions();
+
+      return [...builtInCompletions, ...patternCompletions];
     } catch (error) {
       console.error("NullScript completion error:", error);
       return undefined;
@@ -57,9 +63,9 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
   }
 
   private getBuiltInCompletions(): vscode.CompletionItem[] {
-    return NULLSCRIPT_KEYWORDS.filter(
-      (keyword) => keyword && keyword.nullscript,
-    ).map((keyword) => {
+    return KEYWORDS.filter(
+      (keyword: KeywordMapping) => keyword && keyword.nullscript,
+    ).map((keyword: KeywordMapping) => {
       const completion = new vscode.CompletionItem(
         keyword.nullscript,
         this.getCompletionKind(keyword.category || ""),
@@ -134,6 +140,48 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
     return snippets[keyword];
   }
 
+  private getPatternCompletions(): vscode.CompletionItem[] {
+    const patterns = [
+      {
+        label: "observer-pattern",
+        kind: vscode.CompletionItemKind.Snippet,
+        detail: "Observer Design Pattern",
+        documentation: "Creates a complete Observer pattern implementation",
+        insertText:
+          "model ${1:Subject} {\n\t__init__() {\n\t\tthis.observers = [];\n\t}\n\n\taddObserver(observer) {\n\t\tthis.observers.push(observer);\n\t}\n\n\tnotifyObservers(data) {\n\t\tthis.observers.forEach(observer => observer.update(data));\n\t}\n}\n\nmodel ${2:Observer} {\n\tupdate(data) {\n\t\t${3:// Handle update}\n\t}\n}",
+      },
+      {
+        label: "api-handler",
+        kind: vscode.CompletionItemKind.Snippet,
+        detail: "API Request Handler",
+        documentation:
+          "Creates a complete API request handler with error handling",
+        insertText:
+          "run ${1:handleRequest}(request, response) {\n\ttest {\n\t\tfixed data = await ${2:processRequest}(request);\n\t\tresponse.status(200).json({ success: true, data });\n\t} grab (error) {\n\t\tspeak.scream('API Error:', error);\n\t\tresponse.status(500).json({ success: false, message: error.message });\n\t}\n}",
+      },
+      {
+        label: "event-handler",
+        kind: vscode.CompletionItemKind.Snippet,
+        detail: "Event Handler Class",
+        documentation:
+          "Creates a complete event handler with on/off/emit methods",
+        insertText:
+          "model ${1:EventHandler} {\n\t__init__() {\n\t\tthis.listeners = {};\n\t}\n\n\ton(event, callback) {\n\t\twhen (!this.listeners[event]) {\n\t\t\tthis.listeners[event] = [];\n\t\t}\n\t\tthis.listeners[event].push(callback);\n\t}\n\n\temit(event, data) {\n\t\twhen (this.listeners[event]) {\n\t\t\tthis.listeners[event].forEach(callback => callback(data));\n\t\t}\n\t}\n}",
+      },
+    ];
+
+    return patterns.map((pattern) => {
+      const completion = new vscode.CompletionItem(pattern.label, pattern.kind);
+      completion.detail = pattern.detail;
+      completion.documentation = new vscode.MarkdownString(
+        pattern.documentation,
+      );
+      completion.insertText = new vscode.SnippetString(pattern.insertText);
+      completion.sortText = `z-${pattern.label}`;
+      return completion;
+    });
+  }
+
   private getSpeakMethodCompletions(): vscode.CompletionItem[] {
     const methods = [
       {
@@ -141,7 +189,7 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         kind: vscode.CompletionItemKind.Method,
         detail: "Console log",
         documentation:
-          "Equivalent to `console.log()` in JavaScript. Outputs messages to the console.",
+          "Equivalent to console.log() in JavaScript. Outputs messages to the console.",
         insertText: "say(${1:message})",
       },
       {
@@ -149,7 +197,7 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         kind: vscode.CompletionItemKind.Method,
         detail: "Console error",
         documentation:
-          "Equivalent to `console.error()` in JavaScript. Outputs error messages to the console.",
+          "Equivalent to console.error() in JavaScript. Outputs error messages to the console.",
         insertText: "scream(${1:error})",
       },
       {
@@ -157,7 +205,7 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         kind: vscode.CompletionItemKind.Method,
         detail: "Console warn",
         documentation:
-          "Equivalent to `console.warn()` in JavaScript. Outputs warning messages to the console.",
+          "Equivalent to console.warn() in JavaScript. Outputs warning messages to the console.",
         insertText: "yell(${1:warning})",
       },
     ];
@@ -180,7 +228,7 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         kind: vscode.CompletionItemKind.Method,
         detail: "Get current timestamp",
         documentation:
-          "Returns the current timestamp in milliseconds, equivalent to `Date.now()` in JavaScript.",
+          "Returns the current timestamp in milliseconds, equivalent to Date.now() in JavaScript.",
         insertText: "now()",
       },
       {
@@ -188,7 +236,7 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         kind: vscode.CompletionItemKind.Method,
         detail: "Parse date string",
         documentation:
-          "Parses a date string and returns a timestamp, equivalent to `Date.parse()` in JavaScript.",
+          "Parses a date string and returns a timestamp, equivalent to Date.parse() in JavaScript.",
         insertText: "parse(${1:dateString})",
       },
     ];
@@ -203,11 +251,123 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
       return completion;
     });
   }
+
+  private getImportCompletions(
+    document: vscode.TextDocument,
+    _position: vscode.Position,
+    beforeCursor: string,
+  ): vscode.CompletionItem[] {
+    const completions: vscode.CompletionItem[] = [];
+
+    if (beforeCursor.includes("use {") && !beforeCursor.includes("} from")) {
+      completions.push(...this.getNamedImportCompletions());
+    } else if (
+      beforeCursor.endsWith("from ") ||
+      beforeCursor.includes("from '") ||
+      beforeCursor.includes('from "')
+    ) {
+      completions.push(...this.getModuleCompletions(document));
+    } else if (beforeCursor.includes("use ") && !beforeCursor.includes("{")) {
+      completions.push(...this.getDefaultImportCompletions());
+    }
+
+    return completions;
+  }
+
+  private getNamedImportCompletions(): vscode.CompletionItem[] {
+    const commonExports = [
+      { name: "fs", description: "File system operations", module: "fs" },
+      { name: "path", description: "Path utilities", module: "path" },
+      { name: "http", description: "HTTP server", module: "http" },
+      { name: "express", description: "Express framework", module: "express" },
+      {
+        name: "crypto",
+        description: "Cryptographic functionality",
+        module: "crypto",
+      },
+    ];
+
+    return commonExports.map((exp) => {
+      const completion = new vscode.CompletionItem(
+        exp.name,
+        vscode.CompletionItemKind.Function,
+      );
+      completion.detail = `Import ${exp.name} from ${exp.module}`;
+      completion.documentation = new vscode.MarkdownString(
+        `**${exp.name}** - ${exp.description}\n\n**Module:** \`${exp.module}\``,
+      );
+      completion.insertText = exp.name;
+      return completion;
+    });
+  }
+
+  private getModuleCompletions(
+    _document: vscode.TextDocument,
+  ): vscode.CompletionItem[] {
+    const modules = [
+      { name: "fs", description: "File system operations", type: "built-in" },
+      {
+        name: "path",
+        description: "Path manipulation utilities",
+        type: "built-in",
+      },
+      { name: "http", description: "HTTP server and client", type: "built-in" },
+      { name: "express", description: "Fast web framework", type: "npm" },
+      { name: "lodash", description: "Utility library", type: "npm" },
+    ];
+
+    return modules.map((mod) => {
+      const completion = new vscode.CompletionItem(
+        mod.name,
+        vscode.CompletionItemKind.Module,
+      );
+      completion.detail = `${mod.type} module - ${mod.description}`;
+      completion.documentation = new vscode.MarkdownString(
+        `**${mod.name}** (${mod.type} module)\n\n${mod.description}`,
+      );
+      completion.insertText = `'${mod.name}'`;
+      completion.sortText =
+        mod.type === "local" ? `a-${mod.name}` : `b-${mod.name}`;
+      return completion;
+    });
+  }
+
+  private getDefaultImportCompletions(): vscode.CompletionItem[] {
+    const suggestions = [
+      {
+        label: "use { }",
+        detail: "Named imports",
+        insertText: "{ ${1:exports} } from '${2:module}'",
+        documentation: "Import specific exports from a module",
+      },
+      {
+        label: "use default",
+        detail: "Default import",
+        insertText: "${1:name} from '${2:module}'",
+        documentation: "Import the default export",
+      },
+    ];
+
+    return suggestions.map((suggestion) => {
+      const completion = new vscode.CompletionItem(
+        suggestion.label,
+        vscode.CompletionItemKind.Snippet,
+      );
+      completion.detail = suggestion.detail;
+      completion.documentation = new vscode.MarkdownString(
+        suggestion.documentation,
+      );
+      completion.insertText = new vscode.SnippetString(suggestion.insertText);
+      return completion;
+    });
+  }
 }
 
 class NullScriptHoverProvider implements vscode.HoverProvider {
   private keywordCache = new Map<string, string>();
-  private keywordSet = new Set(NULLSCRIPT_KEYWORDS.map((kw) => kw.nullscript));
+  private keywordSet = new Set(
+    KEYWORDS.map((kw: KeywordMapping) => kw.nullscript),
+  );
 
   provideHover(
     document: vscode.TextDocument,
@@ -252,7 +412,7 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
           hoverInfo +
           "\n\n" +
           "📝 **Note**: This is a valid NullScript operator. If your spell checker flags it as misspelled, " +
-          "you can add NullScript keywords to your dictionary or disable spell checking for `.ns` files.";
+          "you can add NullScript keywords to your dictionary or disable spell checking for .ns files.";
 
         const hover = new vscode.Hover(
           new vscode.MarkdownString(enhancedContent),
@@ -263,7 +423,7 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
     }
 
     if (this.keywordSet.has(word)) {
-      const hoverInfo = this.getHoverInfoFromKeywords(word);
+      const hoverInfo = this.getEnhancedHoverInfo(word, document, position);
       if (hoverInfo) {
         return new vscode.Hover(
           new vscode.MarkdownString(hoverInfo),
@@ -319,6 +479,161 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
     );
   }
 
+  private getEnhancedHoverInfo(
+    word: string,
+    document: vscode.TextDocument,
+    position: vscode.Position,
+  ): string | undefined {
+    if (!word || word.trim() === "") {
+      return undefined;
+    }
+
+    const cacheKey = `${word}-enhanced`;
+    if (this.keywordCache.has(cacheKey)) {
+      return this.keywordCache.get(cacheKey);
+    }
+
+    const keyword = KEYWORDS.find(
+      (kw: KeywordMapping) => kw && kw.nullscript === word,
+    );
+
+    if (!keyword) {
+      return undefined;
+    }
+
+    let hoverContent = `**\`${keyword.nullscript}\`** - ${keyword.description}\n\n`;
+
+    const contextInfo = this.getContextualInfo(word, document, position);
+    if (contextInfo) {
+      hoverContent += `${contextInfo}\n\n`;
+    }
+
+    hoverContent += `🎯 **Category:** ${keyword.category}\n`;
+    hoverContent += `📝 **JavaScript Equivalent:** \`${keyword.javascript}\`\n`;
+    hoverContent += `⚡ **Performance:** ${this.getPerformanceHint(
+      keyword.category,
+    )}\n\n`;
+
+    if (keyword.syntax) {
+      hoverContent += `**Syntax:**\n\`\`\`nullscript\n${keyword.syntax}\n\`\`\`\n\n`;
+    }
+
+    if (keyword.example) {
+      hoverContent += `**Example:**\n\`\`\`nullscript\n${keyword.example}\n\`\`\`\n\n`;
+    }
+
+    const relatedKeywords = this.getRelatedKeywords(keyword.category, word);
+    if (relatedKeywords.length > 0) {
+      hoverContent += `**Related Keywords:** ${relatedKeywords.join(", ")}\n\n`;
+    }
+
+    const bestPractice = this.getBestPractice(word);
+    if (bestPractice) {
+      hoverContent += `💡 **Best Practice:** ${bestPractice}\n\n`;
+    }
+
+    hoverContent += this.getCategoryTip(keyword.category);
+
+    const usageStats = this.getUsageStatistics(word, document);
+    if (usageStats) {
+      hoverContent += `\n\n📊 **Usage in File:** ${usageStats}`;
+    }
+
+    this.keywordCache.set(cacheKey, hoverContent);
+    return hoverContent;
+  }
+
+  private getContextualInfo(
+    word: string,
+    document: vscode.TextDocument,
+    position: vscode.Position,
+  ): string | undefined {
+    const lineText = document.lineAt(position).text;
+
+    if (word === "test" || word === "grab") {
+      return "⚠️ **Context:** Consider adding matching `grab` block for error handling";
+    }
+
+    if (word === "run" && lineText.includes("later")) {
+      return "🚀 **Context:** Async function detected - remember to use `await` when calling";
+    }
+
+    if (word === "model") {
+      return "🏗️ **Context:** Class definition - consider inheritance and encapsulation";
+    }
+
+    if (word === "use" || word === "share") {
+      return "📦 **Context:** Module import/export statement";
+    }
+
+    return undefined;
+  }
+
+  private getPerformanceHint(category: string): string {
+    const hints: { [key: string]: string } = {
+      "Control Flow": "Minimal overhead",
+      "Variables & Declarations": "Fast variable access",
+      "Functions & Methods": "Function call overhead",
+      Operators: "Optimized operations",
+      "Types & Classes": "Object creation cost",
+      "Console Methods": "I/O operation cost",
+      "Global Objects": "Built-in optimizations",
+      "Global Functions": "Native performance",
+      "Timing Functions": "Async overhead",
+      "Boolean Values": "Primitive value",
+      "Modules & Imports": "One-time load cost",
+      "Error Handling": "Exception handling cost",
+      "Object-Oriented": "Method lookup cost",
+      "Async/Await": "Promise overhead",
+      Utility: "Varies by operation",
+    };
+
+    return hints[category] || "Standard performance";
+  }
+
+  private getRelatedKeywords(category: string, currentWord: string): string[] {
+    const categoryKeywords = KEYWORDS.filter(
+      (kw: KeywordMapping) =>
+        kw.category === category && kw.nullscript !== currentWord,
+    )
+      .slice(0, 4)
+      .map((kw: KeywordMapping) => `\`${kw.nullscript}\``);
+
+    return categoryKeywords;
+  }
+
+  private getBestPractice(word: string): string | undefined {
+    const practices: { [key: string]: string } = {
+      test: "Always pair with `grab` for comprehensive error handling",
+      run: "Use descriptive function names and consider async patterns",
+      model: "Follow single responsibility principle and encapsulation",
+      let: "Prefer `fixed` for constants to prevent accidental mutations",
+      fixed: "Use for immutable values and configuration",
+      when: "Consider using `whatever` for complex branching logic",
+      since: "Prefer `for...of` loops when working with arrays",
+      use: "Group related imports and organize by source (built-in, npm, local)",
+      share: "Export only what's necessary to maintain clean APIs",
+    };
+
+    return practices[word];
+  }
+
+  private getUsageStatistics(
+    word: string,
+    document: vscode.TextDocument,
+  ): string | undefined {
+    const text = document.getText();
+    const regex = new RegExp(`\\b${word}\\b`, "g");
+    const matches = text.match(regex);
+    const count = matches ? matches.length : 0;
+
+    if (count > 1) {
+      return `Used ${count} times in this file`;
+    }
+
+    return undefined;
+  }
+
   private getMethodHover(
     word: string,
     lineText: string,
@@ -358,23 +673,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    const dotIndex = beforeWord.lastIndexOf(".");
-    if (dotIndex > 0) {
-      const lastWordStart = beforeWord.lastIndexOf(" ", dotIndex) + 1;
-      const lastWord = beforeWord.substring(lastWordStart);
-      const compoundWord = lastWord + word;
-
-      if (this.keywordSet.has(compoundWord)) {
-        const compoundHoverInfo = this.getHoverInfoFromKeywords(compoundWord);
-        if (compoundHoverInfo) {
-          return new vscode.Hover(
-            new vscode.MarkdownString(compoundHoverInfo),
-            wordRange,
-          );
-        }
-      }
-    }
-
     return undefined;
   }
 
@@ -387,8 +685,8 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       return this.keywordCache.get(word);
     }
 
-    const keyword = NULLSCRIPT_KEYWORDS.find(
-      (kw) => kw && kw.nullscript === word,
+    const keyword = KEYWORDS.find(
+      (kw: KeywordMapping) => kw && kw.nullscript === word,
     );
 
     if (!keyword) {
@@ -465,12 +763,10 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
 
   private getSpeakMethodHover(method: string): string {
     const methodInfo: { [key: string]: string } = {
-      say: '**`speak.say()`** - Console Log Method\n\n🎯 **Purpose:** Outputs informational messages\n📝 **JavaScript Equivalent:** `console.log()`\n\n**Parameters:**\n- `message` - Any value to display\n- Additional parameters for multiple values\n\n**Examples:**\n```nullscript\nspeak.say("Hello World!");\nspeak.say("User:", userName);\nspeak.say(`Score: ${score}`);\n```',
-
+      say: '**`speak.say()`** - Console Log Method\n\n🎯 **Purpose:** Outputs informational messages\n📝 **JavaScript Equivalent:** `console.log()`\n\n**Example:**\n```nullscript\nspeak.say("Hello World!");\n```',
       scream:
-        '**`speak.scream()`** - Console Error Method\n\n🎯 **Purpose:** Outputs error messages\n📝 **JavaScript Equivalent:** `console.error()`\n\n**Parameters:**\n- `error` - Error message or object\n\n**Examples:**\n```nullscript\nspeak.scream("Something went wrong!");\nspeak.scream("Error:", errorObject);\n```\n\n⚠️ **Note:** Typically displayed in red in console',
-
-      yell: '**`speak.yell()`** - Console Warning Method\n\n🎯 **Purpose:** Outputs warning messages\n📝 **JavaScript Equivalent:** `console.warn()`\n\n**Parameters:**\n- `warning` - Warning message\n\n**Examples:**\n```nullscript\nspeak.yell("Deprecated function used");\nspeak.yell("Warning:", warningMessage);\n```\n\n⚠️ **Note:** Typically displayed in yellow in console',
+        '**`speak.scream()`** - Console Error Method\n\n🎯 **Purpose:** Outputs error messages\n📝 **JavaScript Equivalent:** `console.error()`\n\n**Example:**\n```nullscript\nspeak.scream("Something went wrong!");\n```',
+      yell: '**`speak.yell()`** - Console Warning Method\n\n🎯 **Purpose:** Outputs warning messages\n📝 **JavaScript Equivalent:** `console.warn()`\n\n**Example:**\n```nullscript\nspeak.yell("Deprecated function used");\n```',
     };
 
     return methodInfo[method] || "";
@@ -478,10 +774,9 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
 
   private getClockMethodHover(method: string): string {
     const methodInfo: { [key: string]: string } = {
-      now: "**`clock.now()`** - Current Timestamp\n\n🎯 **Purpose:** Returns current time in milliseconds\n📝 **JavaScript Equivalent:** `Date.now()`\n\n**Returns:** Number (milliseconds since Unix epoch)\n\n**Example:**\n```nullscript\nfixed timestamp = clock.now();\nspeak.say(`Current time: ${timestamp}`);\n```",
-
+      now: "**`clock.now()`** - Current Timestamp\n\n🎯 **Purpose:** Returns current time in milliseconds\n📝 **JavaScript Equivalent:** `Date.now()`\n\n**Example:**\n```nullscript\nfixed timestamp = clock.now();\n```",
       parse:
-        '**`clock.parse()`** - Parse Date String\n\n🎯 **Purpose:** Parses a date string and returns timestamp\n📝 **JavaScript Equivalent:** `Date.parse()`\n\n**Parameters:**\n- `dateString` - Date string to parse\n\n**Returns:** Number (milliseconds) or NaN if invalid\n\n**Example:**\n```nullscript\nfixed parsed = clock.parse("2024-01-01");\n```',
+        '**`clock.parse()`** - Parse Date String\n\n🎯 **Purpose:** Parses a date string and returns timestamp\n📝 **JavaScript Equivalent:** `Date.parse()`\n\n**Example:**\n```nullscript\nfixed parsed = clock.parse("2024-01-01");\n```',
     };
 
     return methodInfo[method] || "";

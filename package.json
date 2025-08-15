@@ -1,10 +1,10 @@
 {
   "name": "nullscript-intelligence",
   "displayName": "NullScript Intelligence",
-  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, and beautiful syntax highlighting",
-  "version": "0.1.1",
+  "description": "Intelligent language support for NullScript: smart auto-completion with design patterns, contextual hover documentation, import assistance, and beautiful syntax highlighting",
+  "version": "0.1.2",
   "publisher": "nullscript-lang",
-  "icon": "icon.png",
+  "icon": "./images/icon.png",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -72,8 +72,8 @@
         ],
         "configuration": "./language-configuration.json",
         "icon": {
-          "light": "./images/ns-file-icon.png",
-          "dark": "./images/ns-file-icon.png"
+          "light": "./images/file-icon.png",
+          "dark": "./images/file-icon.png"
         }
       }
     ],
