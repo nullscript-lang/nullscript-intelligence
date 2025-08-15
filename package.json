@@ -2,7 +2,7 @@
   "name": "nullscript-intelligence",
   "displayName": "NullScript Intelligence",
   "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, syntax highlighting, and real-time error detection",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "nullscript-lang",
   "icon": "icon.png",
   "engines": {
