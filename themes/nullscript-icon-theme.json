@@ -1,0 +1,28 @@
+{
+    "iconDefinitions": {
+        "nullscript": {
+            "iconPath": "../images/ns-file-icon.png"
+        }
+    },
+    "fileExtensions": {
+        "ns": "nullscript"
+    },
+    "fileNames": {
+        "nullscript.config.js": "nullscript",
+        "nullscript.config.json": "nullscript",
+        ".nullscriptrc": "nullscript"
+    },
+    "languageIds": {
+        "nullscript": "nullscript"
+    },
+    "light": {
+        "fileExtensions": {
+            "ns": "nullscript"
+        }
+    },
+    "highContrast": {
+        "fileExtensions": {
+            "ns": "nullscript"
+        }
+    }
+}

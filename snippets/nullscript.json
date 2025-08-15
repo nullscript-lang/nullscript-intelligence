@@ -1,0 +1,128 @@
+{
+  "NullScript Function": {
+    "prefix": "run",
+    "body": [
+      "run ${1:functionName}(${2:params}) {",
+      "    ${3:// function body}",
+      "    return ${4:value};",
+      "}"
+    ],
+    "description": "Create a NullScript function"
+  },
+  "NullScript Async Function": {
+    "prefix": "later",
+    "body": [
+      "later run ${1:functionName}(${2:params}) {",
+      "    ${3:// async function body}",
+      "    return hold ${4:promise};",
+      "}"
+    ],
+    "description": "Create an async NullScript function"
+  },
+  "NullScript Class": {
+    "prefix": "model",
+    "body": [
+      "model ${1:ClassName} {",
+      "    run __init__(${2:params}) {",
+      "        ${3:// constructor}",
+      "    }",
+      "",
+      "    run ${4:methodName}(${5:params}) {",
+      "        ${6:// method body}",
+      "    }",
+      "}"
+    ],
+    "description": "Create a NullScript class"
+  },
+  "NullScript If Statement": {
+    "prefix": "whatever",
+    "body": [
+      "whatever (${1:condition}) {",
+      "    ${2:// if true}",
+      "} otherwise {",
+      "    ${3:// if false}",
+      "}"
+    ],
+    "description": "Create a NullScript if statement"
+  },
+  "NullScript For Loop": {
+    "prefix": "since",
+    "body": [
+      "since (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {",
+      "    ${3:// loop body}",
+      "}"
+    ],
+    "description": "Create a NullScript for loop"
+  },
+  "NullScript While Loop": {
+    "prefix": "when",
+    "body": [
+      "when (${1:condition}) {",
+      "    ${2:// loop body}",
+      "}"
+    ],
+    "description": "Create a NullScript while loop"
+  },
+  "NullScript Try-Catch": {
+    "prefix": "test",
+    "body": [
+      "test {",
+      "    ${1:// try code}",
+      "} grab (${2:error}) {",
+      "    ${3:// handle error}",
+      "} atLast {",
+      "    ${4:// finally}",
+      "}"
+    ],
+    "description": "Create a NullScript try-catch block"
+  },
+  "NullScript Console Log": {
+    "prefix": "speak.say",
+    "body": [
+      "speak.say(${1:message});"
+    ],
+    "description": "Log a message to console"
+  },
+  "NullScript Console Error": {
+    "prefix": "speak.scream",
+    "body": [
+      "speak.scream(${1:error});"
+    ],
+    "description": "Log an error to console"
+  },
+  "NullScript Console Warn": {
+    "prefix": "speak.yell",
+    "body": [
+      "speak.yell(${1:warning});"
+    ],
+    "description": "Log a warning to console"
+  },
+  "NullScript Import": {
+    "prefix": "use",
+    "body": [
+      "use { ${1:imports} } from '${2:module}';"
+    ],
+    "description": "Import from module"
+  },
+  "NullScript Export": {
+    "prefix": "share",
+    "body": [
+      "share { ${1:exports} };"
+    ],
+    "description": "Export items"
+  },
+  "NullScript Variable": {
+    "prefix": "fixed",
+    "body": [
+      "fixed ${1:variableName} = ${2:value};"
+    ],
+    "description": "Create a constant variable"
+  },
+  "NullScript Let Variable": {
+    "prefix": "let",
+    "body": [
+      "let ${1:variableName} = ${2:value};"
+    ],
+    "description": "Create a let variable"
+  }
+}

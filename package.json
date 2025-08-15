@@ -1,0 +1,134 @@
+{
+  "name": "nullscript-intelligence",
+  "displayName": "NullScript Intelligence",
+  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, syntax highlighting, and real-time error detection",
+  "version": "0.1.0",
+  "publisher": "nullscript-lang",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Language Packs",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "nullscript",
+    "javascript",
+    "programming-language",
+    "intelligence",
+    "autocomplete",
+    "intellisense",
+    "hover",
+    "documentation",
+    "error-detection",
+    "language-support",
+    "syntax-highlighting",
+    "transpiler",
+    "compiler",
+    "language-server"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nullscript-lang/nullscript.git",
+    "directory": "vscode-extension"
+  },
+  "homepage": "https://nullscript.js.org",
+  "bugs": {
+    "url": "https://github.com/nullscript-lang/nullscript/issues"
+  },
+  "license": "MIT",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "qna": "marketplace",
+  "badges": [
+    {
+      "url": "https://img.shields.io/github/license/nullscript-lang/nullscript",
+      "href": "https://github.com/nullscript-lang/nullscript/blob/main/LICENSE",
+      "description": "License"
+    },
+    {
+      "url": "https://img.shields.io/github/stars/nullscript-lang/nullscript",
+      "href": "https://github.com/nullscript-lang/nullscript",
+      "description": "GitHub Stars"
+    }
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "nullscript",
+        "aliases": [
+          "NullScript",
+          "nullscript"
+        ],
+        "extensions": [
+          ".ns"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/ns-file-icon.png",
+          "dark": "./images/ns-file-icon.png"
+        }
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "nullscript-icons",
+        "label": "NullScript File Icons",
+        "path": "./themes/nullscript-icon-theme.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "nullscript",
+        "scopeName": "source.nullscript",
+        "path": "./syntaxes/nullscript.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "nullscript",
+        "path": "./snippets/nullscript.json"
+      }
+    ],
+    "configuration": {
+      "title": "NullScript Intelligence",
+      "properties": {
+        "nullscript.completion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable intelligent auto-completion for NullScript keywords and methods"
+        },
+        "nullscript.hover.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable smart hover documentation with examples and tips"
+        },
+        "nullscript.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable intelligent error detection and syntax validation with suggestions"
+        }
+      }
+    },
+    "commands": []
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "24.x",
+    "@types/vscode": "^1.102.0",
+    "@vscode/vsce": "^3.6.0",
+    "typescript": "^5.9.2"
+  }
+}
