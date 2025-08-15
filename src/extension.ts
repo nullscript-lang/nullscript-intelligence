@@ -2,16 +2,14 @@ import * as vscode from "vscode";
 import { NULLSCRIPT_KEYWORDS } from "./nullscript-keywords";
 
 export function activate(context: vscode.ExtensionContext) {
-  // Register completion provider
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     { language: "nullscript" },
     new NullScriptCompletionProvider(),
-    ".", // Trigger on dot
-    " ", // Trigger on space
-    "(", // Trigger on opening parenthesis
+    ".",
+    " ",
+    "(",
   );
 
-  // Register hover provider with high priority to override spell checkers
   const hoverProvider = vscode.languages.registerHoverProvider(
     {
       language: "nullscript",
@@ -20,70 +18,15 @@ export function activate(context: vscode.ExtensionContext) {
     new NullScriptHoverProvider(),
   );
 
-  // Register signature help provider
-  const signatureProvider = vscode.languages.registerSignatureHelpProvider(
-    { language: "nullscript" },
-    new NullScriptSignatureProvider(),
-    "(",
-    ",",
-  );
-
-  // Register diagnostics for runtime error detection
-  const diagnosticCollection =
-    vscode.languages.createDiagnosticCollection("nullscript");
-
-  // Listen for document changes to provide real-time error checking
-  const documentChangeListener = vscode.workspace.onDidChangeTextDocument(
-    (event) => {
-      if (event.document.languageId === "nullscript") {
-        const config = vscode.workspace.getConfiguration("nullscript");
-        const diagnosticsEnabled = config.get<boolean>(
-          "diagnostics.enabled",
-          true,
-        );
-
-        if (diagnosticsEnabled) {
-          validateNullScriptDocument(event.document, diagnosticCollection);
-        }
-      }
-    },
-  );
-
-  // Also validate when document is opened
-  const documentOpenListener = vscode.workspace.onDidOpenTextDocument(
-    (document) => {
-      if (document.languageId === "nullscript") {
-        const config = vscode.workspace.getConfiguration("nullscript");
-        const diagnosticsEnabled = config.get<boolean>(
-          "diagnostics.enabled",
-          true,
-        );
-
-        if (diagnosticsEnabled) {
-          validateNullScriptDocument(document, diagnosticCollection);
-        }
-      }
-    },
-  );
-
-  // Register commands
-
-  context.subscriptions.push(
-    completionProvider,
-    hoverProvider,
-    signatureProvider,
-    diagnosticCollection,
-    documentChangeListener,
-    documentOpenListener,
-  );
+  context.subscriptions.push(completionProvider, hoverProvider);
 }
 
 class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
   async provideCompletionItems(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken,
-    context: vscode.CompletionContext,
+    _token: vscode.CancellationToken,
+    _context: vscode.CompletionContext,
   ): Promise<vscode.CompletionItem[] | undefined> {
     try {
       const config = vscode.workspace.getConfiguration("nullscript");
@@ -93,21 +36,17 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
         return undefined;
       }
 
-      // Get line text and check for specific contexts
       const lineText = document.lineAt(position).text;
       const beforeCursor = lineText.substring(0, position.character);
 
-      // Check if we're after "speak."
       if (beforeCursor.endsWith("speak.")) {
         return this.getSpeakMethodCompletions();
       }
 
-      // Check if we're after "clock."
       if (beforeCursor.endsWith("clock.")) {
         return this.getClockMethodCompletions();
       }
 
-      // Get built-in completions
       const builtInCompletions = this.getBuiltInCompletions();
 
       return builtInCompletions;
@@ -118,7 +57,6 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
   }
 
   private getBuiltInCompletions(): vscode.CompletionItem[] {
-    // Generate completion items from the keyword database
     return NULLSCRIPT_KEYWORDS.filter(
       (keyword) => keyword && keyword.nullscript,
     ).map((keyword) => {
@@ -139,7 +77,6 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
             : ""),
       );
 
-      // Add snippet insert text for common patterns
       const snippet = this.getSnippetForKeyword(keyword.nullscript);
       if (snippet) {
         completion.insertText = new vscode.SnippetString(snippet);
@@ -266,48 +203,21 @@ class NullScriptCompletionProvider implements vscode.CompletionItemProvider {
       return completion;
     });
   }
-
-  private mapCompletionKind(kind: string): vscode.CompletionItemKind {
-    switch (kind) {
-      case "Keyword":
-        return vscode.CompletionItemKind.Keyword;
-      case "Function":
-        return vscode.CompletionItemKind.Function;
-      case "Method":
-        return vscode.CompletionItemKind.Method;
-      case "Variable":
-        return vscode.CompletionItemKind.Variable;
-      case "Class":
-        return vscode.CompletionItemKind.Class;
-      case "Property":
-        return vscode.CompletionItemKind.Property;
-      case "Module":
-        return vscode.CompletionItemKind.Module;
-      case "Snippet":
-        return vscode.CompletionItemKind.Snippet;
-      default:
-        return vscode.CompletionItemKind.Text;
-    }
-  }
 }
 
 class NullScriptHoverProvider implements vscode.HoverProvider {
-  // Cache for keyword lookups to improve performance
   private keywordCache = new Map<string, string>();
-  // Fast keyword existence lookup
   private keywordSet = new Set(NULLSCRIPT_KEYWORDS.map((kw) => kw.nullscript));
 
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken,
+    _token: vscode.CancellationToken,
   ): vscode.ProviderResult<vscode.Hover> {
-    // Only process .ns files to avoid conflicts with other extensions
     if (!document.fileName.endsWith(".ns")) {
       return undefined;
     }
 
-    // Check if hover is enabled in configuration
     const config = vscode.workspace.getConfiguration("nullscript");
     const hoverEnabled = config.get<boolean>("hover.enabled", true);
 
@@ -315,7 +225,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       return undefined;
     }
 
-    // Ultra-fast path: Get word and check if it's worth processing
     const wordRange = document.getWordRangeAtPosition(position);
     if (!wordRange) {
       return undefined;
@@ -326,23 +235,19 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       return undefined;
     }
 
-    // Immediate exit for very short words or numbers
     if (word.length < 2 || /^\d+$/.test(word)) {
       return undefined;
     }
 
     const lineText = document.lineAt(position).text;
 
-    // Skip if we're in a comment or string (only check if needed)
     if (this.isInCommentOrString(lineText, position.character)) {
       return undefined;
     }
 
-    // PRIORITY: Check for NullScript operators first (these often conflict with spell checkers)
     if (this.isNullScriptOperator(word)) {
       const hoverInfo = this.getHoverInfoFromKeywords(word);
       if (hoverInfo) {
-        // Enhanced content for operators that conflict with spell checkers
         const enhancedContent =
           hoverInfo +
           "\n\n" +
@@ -357,7 +262,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    // Ultra-fast keyword check for other keywords
     if (this.keywordSet.has(word)) {
       const hoverInfo = this.getHoverInfoFromKeywords(word);
       if (hoverInfo) {
@@ -368,7 +272,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    // Check for method calls (only if not a direct keyword match)
     const methodHover = this.getMethodHover(word, lineText, wordRange);
     if (methodHover) {
       return methodHover;
@@ -378,42 +281,26 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
   }
 
   private isNullScriptOperator(word: string): boolean {
-    // NullScript operators that commonly conflict with spell checkers
     const operators = new Set([
-      "isnot", // !== operator
-      "moreeq", // >= operator
-      "lesseq", // <= operator
-      "more", // > operator
-      "less", // < operator
-      "is", // === operator
-      "keepgoing", // continue statement
-      "atLast", // finally block
+      "isnot",
+      "moreeq",
+      "lesseq",
+      "more",
+      "less",
+      "is",
+      "keepgoing",
+      "atLast",
     ]);
 
     return operators.has(word);
   }
 
-  private isPotentialMethodCall(
-    word: string,
-    lineText: string,
-    wordRange: vscode.Range,
-  ): boolean {
-    const beforeWord = lineText.substring(0, wordRange.start.character);
-    return (
-      beforeWord.endsWith("speak.") ||
-      beforeWord.endsWith("clock.") ||
-      beforeWord.includes(".")
-    );
-  }
-
   private isInCommentOrString(lineText: string, charIndex: number): boolean {
-    // Ultra-fast check for line comments
     const commentIndex = lineText.indexOf("//");
     if (commentIndex !== -1 && commentIndex < charIndex) {
       return true;
     }
 
-    // Fast string detection - check if we're inside quotes
     let quoteCount = 0;
     let doubleQuoteCount = 0;
     let backtickCount = 0;
@@ -425,83 +312,11 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       else if (char === "`") backtickCount++;
     }
 
-    // If odd number of quotes before cursor, we're inside a string
     return (
       quoteCount % 2 === 1 ||
       doubleQuoteCount % 2 === 1 ||
       backtickCount % 2 === 1
     );
-  }
-
-  private getOptimizedWordRange(
-    document: vscode.TextDocument,
-    position: vscode.Position,
-  ): vscode.Range | undefined {
-    // Use VS Code's built-in word range detection
-    const wordRange = document.getWordRangeAtPosition(position);
-    if (!wordRange) {
-      return undefined;
-    }
-
-    // Additional validation for NullScript keywords
-    const word = document.getText(wordRange);
-    if (word.length < 2 || word.length > 20) {
-      return undefined; // Skip very short or very long words
-    }
-
-    return wordRange;
-  }
-
-  private isCommonNonKeyword(word: string): boolean {
-    // Fast rejection of common non-keywords (excluding NullScript keywords)
-    const commonWords = new Set([
-      "the",
-      "and",
-      "or",
-      "but",
-      "if",
-      "for",
-      "while",
-      "do",
-      "function",
-      "var",
-      "const",
-      "return",
-      "break",
-      "continue",
-      "true",
-      "false",
-      "null",
-      "undefined",
-      "this",
-      "new",
-      "delete",
-      "typeof",
-      "instanceof",
-      "in",
-      "of",
-      "with",
-      "yield",
-      "await",
-      "class",
-      "extends",
-      "super",
-      "static",
-      "get",
-      "set",
-      "async",
-      "export",
-      "import",
-      "default",
-      "from",
-      "as",
-      "throw",
-      "finally",
-    ]);
-
-    // Don't filter out words that might be NullScript keywords
-    const lowerWord = word.toLowerCase();
-    return commonWords.has(lowerWord);
   }
 
   private getMethodHover(
@@ -511,13 +326,11 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
   ): vscode.Hover | undefined {
     const beforeWord = lineText.substring(0, wordRange.start.character);
 
-    // Ultra-fast method call detection
     const lastChar = beforeWord[beforeWord.length - 1];
     if (lastChar !== ".") {
-      return undefined; // No method call if not preceded by dot
+      return undefined;
     }
 
-    // Check if it's a speak method
     if (beforeWord.endsWith("speak.")) {
       switch (word) {
         case "say":
@@ -532,7 +345,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    // Check if it's a clock method
     if (beforeWord.endsWith("clock.")) {
       switch (word) {
         case "now":
@@ -546,7 +358,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    // Check for compound keywords (optimized)
     const dotIndex = beforeWord.lastIndexOf(".");
     if (dotIndex > 0) {
       const lastWordStart = beforeWord.lastIndexOf(" ", dotIndex) + 1;
@@ -572,12 +383,10 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       return undefined;
     }
 
-    // Check cache first for performance
     if (this.keywordCache.has(word)) {
       return this.keywordCache.get(word);
     }
 
-    // Find the keyword in our keyword database
     const keyword = NULLSCRIPT_KEYWORDS.find(
       (kw) => kw && kw.nullscript === word,
     );
@@ -586,7 +395,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       return undefined;
     }
 
-    // Build the hover content using the keyword data
     let hoverContent = `**\`${keyword.nullscript}\`** - ${keyword.description}\n\n`;
     hoverContent += `🎯 **Category:** ${keyword.category}\n`;
     hoverContent += `📝 **JavaScript Equivalent:** \`${keyword.javascript}\`\n\n`;
@@ -599,17 +407,14 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
       hoverContent += `**Example:**\n\`\`\`nullscript\n${keyword.example}\n\`\`\`\n\n`;
     }
 
-    // Add category-specific tips
     hoverContent += this.getCategoryTip(keyword.category);
 
-    // Cache the result for future lookups
     this.keywordCache.set(word, hoverContent);
 
     return hoverContent;
   }
 
   private getCategoryTip(category: string): string {
-    // Static map for better performance
     const tips = new Map<string, string>([
       [
         "Control Flow",
@@ -681,150 +486,6 @@ class NullScriptHoverProvider implements vscode.HoverProvider {
 
     return methodInfo[method] || "";
   }
-}
-
-class NullScriptSignatureProvider implements vscode.SignatureHelpProvider {
-  provideSignatureHelp(
-    document: vscode.TextDocument,
-    position: vscode.Position,
-    token: vscode.CancellationToken,
-    context: vscode.SignatureHelpContext,
-  ): vscode.ProviderResult<vscode.SignatureHelp> {
-    // Implement signature help functionality
-    return undefined;
-  }
-}
-
-function validateNullScriptDocument(
-  document: vscode.TextDocument,
-  diagnosticCollection: vscode.DiagnosticCollection,
-) {
-  const diagnostics: vscode.Diagnostic[] = [];
-  const text = document.getText();
-  const lines = text.split("\n");
-
-  lines.forEach((line, lineIndex) => {
-    // Check for common syntax errors
-
-    // 1. Unclosed parentheses/brackets/braces
-    const openParens = (line.match(/\(/g) || []).length;
-    const closeParens = (line.match(/\)/g) || []).length;
-    const openBraces = (line.match(/\{/g) || []).length;
-    const closeBraces = (line.match(/\}/g) || []).length;
-    const openBrackets = (line.match(/\[/g) || []).length;
-    const closeBrackets = (line.match(/\]/g) || []).length;
-
-    if (
-      openParens > closeParens ||
-      openBraces > closeBraces ||
-      openBrackets > closeBrackets
-    ) {
-      const diagnostic = new vscode.Diagnostic(
-        new vscode.Range(lineIndex, 0, lineIndex, line.length),
-        "Unclosed parentheses, brackets, or braces",
-        vscode.DiagnosticSeverity.Error,
-      );
-      diagnostics.push(diagnostic);
-    }
-
-    // 2. Invalid keyword usage
-    const invalidKeywords = [
-      "function",
-      "const",
-      "if",
-      "else",
-      "for",
-      "while",
-      "try",
-      "catch",
-      "finally",
-    ];
-    invalidKeywords.forEach((keyword) => {
-      const regex = new RegExp(`\\b${keyword}\\b`, "g");
-      let match;
-      while ((match = regex.exec(line)) !== null) {
-        const diagnostic = new vscode.Diagnostic(
-          new vscode.Range(
-            lineIndex,
-            match.index,
-            lineIndex,
-            match.index + keyword.length,
-          ),
-          `Use NullScript syntax instead of JavaScript keyword '${keyword}'`,
-          vscode.DiagnosticSeverity.Warning,
-        );
-        diagnostic.code = "invalid-js-keyword";
-        diagnostics.push(diagnostic);
-      }
-    });
-
-    // 3. Missing semicolons for statement lines
-    const statementPattern =
-      /^(\s*)(fixed|let|speak\.say|speak\.scream|speak\.yell|return)\s+.+[^;{}]\s*$/;
-    if (statementPattern.test(line.trim())) {
-      const diagnostic = new vscode.Diagnostic(
-        new vscode.Range(lineIndex, line.length - 1, lineIndex, line.length),
-        "Missing semicolon",
-        vscode.DiagnosticSeverity.Information,
-      );
-      diagnostic.code = "missing-semicolon";
-      diagnostics.push(diagnostic);
-    }
-
-    // 4. Undefined NullScript keywords (typos)
-    const words = line.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
-    const validKeywords = new Set(
-      NULLSCRIPT_KEYWORDS.map((kw) => kw.nullscript),
-    );
-    const commonWords = new Set([
-      "var",
-      "console",
-      "log",
-      "error",
-      "warn",
-      "document",
-      "window",
-      "undefined",
-      "null",
-    ]);
-
-    words.forEach((word) => {
-      if (
-        !validKeywords.has(word) &&
-        !commonWords.has(word) &&
-        /^[a-z]+$/.test(word) &&
-        word.length > 3
-      ) {
-        // Check if it might be a typo of a NullScript keyword
-        const similarKeywords = Array.from(validKeywords).filter(
-          (kw) =>
-            Math.abs(kw.length - word.length) <= 2 && kw.startsWith(word[0]),
-        );
-
-        if (similarKeywords.length > 0) {
-          const wordIndex = line.indexOf(word);
-          if (wordIndex !== -1) {
-            const diagnostic = new vscode.Diagnostic(
-              new vscode.Range(
-                lineIndex,
-                wordIndex,
-                lineIndex,
-                wordIndex + word.length,
-              ),
-              `Unknown keyword '${word}'. Did you mean: ${similarKeywords
-                .slice(0, 3)
-                .join(", ")}?`,
-              vscode.DiagnosticSeverity.Hint,
-            );
-            diagnostic.code = "unknown-keyword";
-            diagnostics.push(diagnostic);
-          }
-        }
-      }
-    });
-  });
-
-  diagnosticCollection.set(document.uri, diagnostics);
 }
 
 export function deactivate() {}

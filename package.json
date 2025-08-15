@@ -1,7 +1,7 @@
 {
   "name": "nullscript-intelligence",
   "displayName": "NullScript Intelligence",
-  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, syntax highlighting, and real-time error detection",
+  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, and beautiful syntax highlighting",
   "version": "0.1.1",
   "publisher": "nullscript-lang",
   "icon": "icon.png",
@@ -102,11 +102,6 @@
           "type": "boolean",
           "default": true,
           "description": "Enable smart hover documentation with examples and tips"
-        },
-        "nullscript.diagnostics.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable intelligent error detection and syntax validation with suggestions"
         }
       }
     },
