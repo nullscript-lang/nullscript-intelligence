@@ -2,15 +2,11 @@
 
 🧠 **Intelligent language support for NullScript in VS Code**
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=NullScriptLanguageTeam.nullscript-intelligence)
-[![VS Code](https://img.shields.io/badge/VS%20Code-1.102.0+-brightgreen.svg)](https://code.visualstudio.com/)
-
 ## Features
 
-✨ **Smart Auto-Completion** - Intelligent suggestions for NullScript keywords and methods
-💡 **Hover Documentation** - Rich tooltips with examples and JavaScript equivalents
-🎨 **Syntax Highlighting** - Beautiful highlighting for `.ns` files
-🔍 **Real-time Error Detection** - Live syntax validation with helpful suggestions
+- ✨ **Smart Auto-Completion** - Intelligent suggestions for NullScript keywords and methods
+- 💡 **Hover Documentation** - Rich tooltips with examples and JavaScript equivalents
+- 🎨 **Syntax Highlighting** - Beautiful highlighting for `.ns` files
 
 ## Installation
 
@@ -25,7 +21,7 @@ Install from the VS Code Marketplace:
 
 Create a `.ns` file and start coding:
 
-```nullscript
+```javascript
 run greet(name) {
     speak.say(`Hello, ${name}!`);
 }

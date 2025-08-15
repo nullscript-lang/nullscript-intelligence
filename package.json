@@ -1,8 +1,8 @@
 {
   "name": "nullscript-intelligence",
   "displayName": "NullScript Intelligence",
-  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, syntax highlighting, and real-time error detection",
-  "version": "0.1.0",
+  "description": "Intelligent language support for NullScript: smart auto-completion, hover documentation, and beautiful syntax highlighting",
+  "version": "0.1.1",
   "publisher": "nullscript-lang",
   "icon": "icon.png",
   "engines": {
@@ -77,13 +77,6 @@
         }
       }
     ],
-    "iconThemes": [
-      {
-        "id": "nullscript-icons",
-        "label": "NullScript File Icons",
-        "path": "./themes/nullscript-icon-theme.json"
-      }
-    ],
     "grammars": [
       {
         "language": "nullscript",
@@ -109,11 +102,6 @@
           "type": "boolean",
           "default": true,
           "description": "Enable smart hover documentation with examples and tips"
-        },
-        "nullscript.diagnostics.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable intelligent error detection and syntax validation with suggestions"
         }
       }
     },
@@ -126,8 +114,8 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/node": "24.x",
-    "@types/vscode": "^1.102.0",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.74.0",
     "@vscode/vsce": "^3.6.0",
     "typescript": "^5.9.2"
   }
