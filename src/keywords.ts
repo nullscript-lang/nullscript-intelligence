@@ -1,31 +1,6 @@
-export interface KeywordMapping {
-  nullscript: string;
-  javascript: string;
-  category: KeywordCategory;
-  description: string;
-  syntax?: string;
-  example?: string;
-}
+import { KeywordCategory, KeywordMapping } from "./interface";
 
-export enum KeywordCategory {
-  CONTROL_FLOW = "Control Flow",
-  VARIABLES = "Variables & Declarations",
-  FUNCTIONS = "Functions & Methods",
-  OPERATORS = "Operators",
-  TYPES = "Types & Classes",
-  CONSOLE = "Console Methods",
-  GLOBAL_OBJECTS = "Global Objects",
-  GLOBAL_FUNCTIONS = "Global Functions",
-  TIMING = "Timing Functions",
-  BOOLEAN = "Boolean Values",
-  MODULES = "Modules & Imports",
-  ERROR_HANDLING = "Error Handling",
-  OBJECT_ORIENTED = "Object-Oriented",
-  ASYNC = "Async/Await",
-  UTILITY = "Utility",
-}
-
-export const NULLSCRIPT_KEYWORDS: KeywordMapping[] = [
+export const KEYWORDS: KeywordMapping[] = [
   // Control Flow
   {
     nullscript: "run",
@@ -758,67 +733,64 @@ export const NULLSCRIPT_KEYWORDS: KeywordMapping[] = [
   },
 ];
 
-// Group keywords by category for easier access
 export const KEYWORDS_BY_CATEGORY: Record<KeywordCategory, KeywordMapping[]> = {
-  [KeywordCategory.CONTROL_FLOW]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.CONTROL_FLOW]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.CONTROL_FLOW,
   ),
-  [KeywordCategory.VARIABLES]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.VARIABLES]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.VARIABLES,
   ),
-  [KeywordCategory.FUNCTIONS]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.FUNCTIONS]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.FUNCTIONS,
   ),
-  [KeywordCategory.OPERATORS]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.OPERATORS]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.OPERATORS,
   ),
-  [KeywordCategory.TYPES]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.TYPES]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.TYPES,
   ),
-  [KeywordCategory.CONSOLE]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.CONSOLE]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.CONSOLE,
   ),
-  [KeywordCategory.GLOBAL_OBJECTS]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.GLOBAL_OBJECTS]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.GLOBAL_OBJECTS,
   ),
-  [KeywordCategory.GLOBAL_FUNCTIONS]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.GLOBAL_FUNCTIONS]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.GLOBAL_FUNCTIONS,
   ),
-  [KeywordCategory.TIMING]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.TIMING]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.TIMING,
   ),
-  [KeywordCategory.BOOLEAN]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.BOOLEAN]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.BOOLEAN,
   ),
-  [KeywordCategory.MODULES]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.MODULES]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.MODULES,
   ),
-  [KeywordCategory.ERROR_HANDLING]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.ERROR_HANDLING]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.ERROR_HANDLING,
   ),
-  [KeywordCategory.OBJECT_ORIENTED]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.OBJECT_ORIENTED]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.OBJECT_ORIENTED,
   ),
-  [KeywordCategory.ASYNC]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.ASYNC]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.ASYNC,
   ),
-  [KeywordCategory.UTILITY]: NULLSCRIPT_KEYWORDS.filter(
+  [KeywordCategory.UTILITY]: KEYWORDS.filter(
     (k) => k.category === KeywordCategory.UTILITY,
   ),
 };
 
-// Create lookup maps for fast access
 export const KEYWORD_LOOKUP: Record<string, KeywordMapping> = {};
 export const JS_TO_NULLSCRIPT: Record<string, string> = {};
 export const NULLSCRIPT_TO_JS: Record<string, string> = {};
 
-NULLSCRIPT_KEYWORDS.forEach((mapping) => {
+KEYWORDS.forEach((mapping) => {
   KEYWORD_LOOKUP[mapping.nullscript] = mapping;
   JS_TO_NULLSCRIPT[mapping.javascript] = mapping.nullscript;
   NULLSCRIPT_TO_JS[mapping.nullscript] = mapping.javascript;
 });
 
-// Forbidden keywords and invalid syntax patterns
 export const FORBIDDEN_KEYWORDS = [
   "interface",
   "enum",
