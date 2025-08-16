@@ -100,8 +100,6 @@ We welcome various types of contributions:
 - Create tutorial content
 
 #### 🧪 Testing
-- Add unit tests
-- Create integration tests
 - Performance testing
 - Cross-platform validation
 
