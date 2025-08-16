@@ -32,12 +32,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nullscript-lang/nullscript.git",
+    "url": "https://github.com/nullscript-lang/nullscript-intelligence.git",
     "directory": "vscode-extension"
   },
   "homepage": "https://nullscript.js.org",
   "bugs": {
-    "url": "https://github.com/nullscript-lang/nullscript/issues"
+    "url": "https://github.com/nullscript-lang/nullscript-intelligence/issues"
   },
   "license": "MIT",
   "galleryBanner": {
@@ -47,13 +47,13 @@
   "qna": "marketplace",
   "badges": [
     {
-      "url": "https://img.shields.io/github/license/nullscript-lang/nullscript",
-      "href": "https://github.com/nullscript-lang/nullscript/blob/main/LICENSE",
+      "url": "https://img.shields.io/github/license/nullscript-lang/nullscript-intelligence",
+      "href": "https://github.com/nullscript-lang/nullscript-intelligence/blob/main/LICENSE",
       "description": "License"
     },
     {
-      "url": "https://img.shields.io/github/stars/nullscript-lang/nullscript",
-      "href": "https://github.com/nullscript-lang/nullscript",
+      "url": "https://img.shields.io/github/stars/nullscript-lang/nullscript-intelligence",
+      "href": "https://github.com/nullscript-lang/nullscript-intelligence",
       "description": "GitHub Stars"
     }
   ],

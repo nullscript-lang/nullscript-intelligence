@@ -79,6 +79,29 @@ greet("World");
 
 Learn more at [nullscript.js.org](https://nullscript.js.org/guide/vscode-extension.html)
 
+## 🤝 Contributing
+
+We welcome contributions to improve NullScript Intelligence! Here's how you can help:
+
+### Quick Start for Contributors
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork**: `git clone https://github.com/nullscript-lang/nullscript-intelligence.git`
+3. **Install dependencies**: `npm install`
+4. **Make your changes** to the extension code
+5. **Test your changes**: Press F5 to run the extension in a new VS Code window
+6. **Submit a pull request** with a clear description of your changes
+
+### Areas We Need Help With
+
+- 🐛 **Bug fixes** - Help us squash bugs and improve reliability
+- ✨ **New features** - Add new keywords, snippets, or completion improvements
+- 📚 **Documentation** - Improve READMEs, code comments, and user guides
+- 🧪 **Testing** - Add tests for existing and new functionality
+- 🎨 **UI/UX** - Improve hover documentation and completion presentation
+
+For detailed contribution guidelines, see our [Contributing Guide](https://github.com/nullscript-lang/nullscript-intelligence/blob/main/CONTRIBUTING.md).
+
 ---
 
 **Happy coding with NullScript! 🎭✨**
