@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./images/icon.png" alt="NullScript Logo" width="128" height="128">
+  <img src="https://raw.githubusercontent.com/nullscript-lang/nullscript-intelligence/refs/heads/main/images/icon.png" alt="NullScript Logo" width="128" height="128">
   <h1 align="center">
     NullScript Intelligence
   </h1>
@@ -10,7 +10,7 @@
 
   <p align="center">
     <a href="https://marketplace.visualstudio.com/items?itemName=nullscript-lang.nullscript-intelligence">
-      <img src="https://img.shields.io/badge/version-0.1.2-blue.svg" alt="Latest Release">
+      <img src="https://img.shields.io/visual-studio-marketplace/v/nullscript-lang.nullscript-intelligence?style=flat-square" alt="Latest Release">
     </a>
     <a href="https://github.com/nullscript-lang/nullscript/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/nullscript-lang/nullscript?style=flat-square" alt="License">
