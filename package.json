@@ -2,7 +2,7 @@
   "name": "nullscript-intelligence",
   "displayName": "NullScript Intelligence",
   "description": "Intelligent language support for NullScript: smart auto-completion with design patterns, contextual hover documentation, import assistance, and beautiful syntax highlighting",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "nullscript-lang",
   "icon": "./images/icon.png",
   "engines": {
@@ -111,7 +111,9 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package"
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "clean": "rm *.vsix"
   },
   "devDependencies": {
     "@types/node": "20.x",
